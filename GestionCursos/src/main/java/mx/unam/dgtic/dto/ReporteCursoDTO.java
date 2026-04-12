@@ -1,0 +1,16 @@
+package mx.unam.dgtic.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class ReporteCursoDTO {
+    private String nombreCurso;
+    private String nombreInstructor;
+    private int totalAlumnos;
+    private float promedioCalificacion;
+    private float porcentajeAprobacion;
+}
