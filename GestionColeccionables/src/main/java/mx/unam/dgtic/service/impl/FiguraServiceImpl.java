@@ -1,13 +1,17 @@
 package mx.unam.dgtic.service.impl;
 
+import mx.unam.dgtic.dao.impl.EdicionDAO;
+import mx.unam.dgtic.dao.impl.FabricanteDAO;
 import mx.unam.dgtic.dao.impl.FiguraDAO;
 import mx.unam.dgtic.db.Conexion;
 import mx.unam.dgtic.domain.Edicion;
 import mx.unam.dgtic.domain.Fabricante;
 import mx.unam.dgtic.domain.Figura;
+import mx.unam.dgtic.domain.Pais;
 import mx.unam.dgtic.dto.EdicionDTO;
 import mx.unam.dgtic.dto.FabricanteDTO;
 import mx.unam.dgtic.dto.FiguraDTO;
+import mx.unam.dgtic.dto.PaisDTO;
 import mx.unam.dgtic.service.FiguraService;
 
 import java.sql.Connection;
@@ -93,6 +97,37 @@ public class FiguraServiceImpl implements FiguraService {
                     throw new RuntimeException(ex);
                 }
             }
+        }
+    }
+
+    @Override
+    public void registrarFigura(Figura figura, Fabricante fabricante, Edicion edicion) {
+        try (Connection connection = Conexion.getConnection()) {
+            connection.setAutoCommit(false);
+
+            FabricanteDAO fabricanteDAO = new FabricanteDAO(connection);
+            EdicionDAO edicionDAO = new EdicionDAO(connection);
+            FiguraDAO figuraDAO = new FiguraDAO(connection);
+
+            try {
+                if (fabricante.getId() == 0) fabricanteDAO.insert(fabricante);
+                if (edicion.getId() == 0) edicionDAO.insert(edicion);
+
+                figura.setFabricante(fabricante);
+                figura.setEdicion(edicion);
+
+                if (figura.getId() == 0) figuraDAO.insert(figura);
+                else figuraDAO.update(figura);
+
+                connection.commit();
+
+            } catch (Exception e) {
+                connection.rollback();
+                throw new RuntimeException(e);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error de conexión.", e);
         }
     }
 
